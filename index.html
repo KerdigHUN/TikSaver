@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikSaver - Pro TikTok Downloader</title>
+    <!-- Google Fonts: Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- Alapstílusok és Háttér --- */
+        :root {
+            --primary-color: #fe2c55; 
+            --secondary-color: #25f4ee; 
+            --bg-gradient: linear-gradient(135deg, #121212 0%, #2d3475 100%);
+            --text-color: #ffffff;
+            --panel-bg: rgba(255, 255, 255, 0.05);
+            --panel-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column; /* Egymás alá rendezi az elemeket */
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* --- REKLÁM HELYEK (AD SPACES) --- */
+        .ad-space {
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 0.85rem;
+            margin: 20px 0;
+            width: 100%;
+        }
+
+        .ad-top, .ad-bottom {
+            max-width: 728px;
+            height: 90px; /* Szabványos banner méret */
+        }
+
+        .ad-middle {
+            height: auto;
+            min-height: 100px;
+            margin: 10px 0 20px 0;
+            padding: 10px;
+        }
+
+        /* --- Fő Konténer (Üveghatás) --- */
+        .glass-container {
+            background: var(--panel-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 24px;
+            border: 1px solid var(--panel-border);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            padding: 40px;
+            width: 100%;
+            max-width: 550px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        /* --- Tipográfia --- */
+        h1 {
+            font-weight: 700;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #ffffff, var(--secondary-color), var(--primary-color), #ffffff);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 3s linear infinite;
+        }
+
+        @keyframes shine {
+            to { background-position: 200% center; }
+        }
+
+        .subtitle {
+            font-weight: 300;
+            opacity: 0.8;
+            margin-bottom: 30px;
+            font-size: 1rem;
+        }
+
+        /* --- Beviteli Mező és Gomb Csoport --- */
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 2px solid var(--panel-border);
+            border-radius: 50px;
+            color: #fff;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 15px rgba(37, 244, 238, 0.3);
+        }
+
+        /* --- Fő Gomb --- */
+        .btn-search {
+            width: 100%;
+            padding: 15px 30px;
+            background: var(--primary-color);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(254, 44, 85, 0.3);
+        }
+
+        .btn-search:hover {
+            background: #e0244b;
+            box-shadow: 0 8px 20px rgba(254, 44, 85, 0.5);
+            transform: scale(1.02);
+        }
+
+        /* --- Eredmény Zóna --- */
+        #result {
+            margin-top: 10px;
+            min-height: 50px;
+        }
+
+        .loader {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-left-color: var(--secondary-color);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .success-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .success-title {
+            color: var(--secondary-color);
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .download-btn {
+            display: inline-block;
+            background: linear-gradient(45deg, var(--secondary-color), #20c9c3);
+            color: #000;
+            text-decoration: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-weight: 700;
+            margin-top: 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(37, 244, 238, 0.2);
+        }
+
+        .download-btn:hover {
+            box-shadow: 0 6px 15px rgba(37, 244, 238, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .error-msg {
+            color: #ff4a4a;
+            background: rgba(255, 74, 74, 0.1);
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 74, 74, 0.2);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 480px) {
+            .glass-container { padding: 25px; }
+            h1 { font-size: 1.8rem; }
+            .ad-top, .ad-bottom { height: 50px; } /* Mobilon kisebb banner */
+        }
+    </style>
+</head>
+<body>
+
+<!-- 1. Felső Reklám Hely -->
+<div class="ad-space ad-top" id="ad-top-container">
+    <p>Advertisement Space (728x90)</p>
+    <!-- IDE JÖN MAJD AZ ADSENSE KÓD -->
+</div>
+
+<div class="glass-container">
+    <h1>TikSaver</h1>
+    <p class="subtitle">Download TikTok videos without watermark instantly.</p>
+    
+    <div class="input-group">
+        <input type="text" id="videoUrl" placeholder="Paste TikTok link here...">
+        <button onclick="fetchVideo()" class="btn-search" id="searchBtn">
+            <span id="btnText">Get Video</span>
+        </button>
+    </div>
+
+    <!-- 2. Középső Reklám Hely (A gomb és az eredmény között) -->
+    <div class="ad-space ad-middle" id="ad-middle-container">
+        <p>Advertisement Space (Responsive)</p>
+        <!-- IDE JÖN MAJD AZ ADSENSE KÓD -->
+    </div>
+
+    <!-- Betöltésjelző -->
+    <div class="loader" id="loader"></div>
+
+    <!-- Eredmény helye -->
+    <div id="result"></div>
+</div>
+
+<!-- 3. Alsó Reklám Hely -->
+<div class="ad-space ad-bottom" id="ad-bottom-container">
+    <p>Advertisement Space (728x90)</p>
+    <!-- IDE JÖN MAJD AZ ADSENSE KÓD -->
+</div>
+
+<script>
+async function fetchVideo() {
+    const urlInput = document.getElementById('videoUrl').value;
+    const resultDiv = document.getElementById('result');
+    const loader = document.getElementById('loader');
+    const searchBtn = document.getElementById('searchBtn');
+    const btnText = document.getElementById('btnText');
+
+    resultDiv.innerHTML = '';
+    
+    if (!urlInput) {
+        resultDiv.innerHTML = '<p class="error-msg">⚠️ Please enter a valid TikTok link!</p>';
+        return;
+    }
+
+    loader.style.display = 'block';
+    searchBtn.disabled = true;
+    btnText.innerText = 'Processing...';
+    searchBtn.style.opacity = '0.7';
+
+    // A Te RapidAPI kulcsod:
+    const apiKey = 'b127729081msh4606b9b6ba3eb4ap1b4440jsn7dfb417bdf74'; 
+    const apiUrl = `https://tiktok-video-downloader-api.p.rapidapi.com/media?videoUrl=${encodeURIComponent(urlInput)}`;
+
+    const options = {
+        method: 'GET',
+        headers: {
+            'x-rapidapi-key': apiKey,
+            'x-rapidapi-host': 'tiktok-video-downloader-api.p.rapidapi.com'
+        }
+    };
+
+    try {
+        const response = await fetch(apiUrl, options);
+        const data = await response.json();
+
+        loader.style.display = 'none';
+        searchBtn.disabled = false;
+        btnText.innerText = 'Get Video';
+        searchBtn.style.opacity = '1';
+
+        if (data && data.downloadUrl) {
+            resultDiv.innerHTML = `
+                <div class="success-card">
+                    <div class="success-title">
+                        <span>✅</span> Video Ready!
+                    </div>
+                    <p style="margin-bottom: 10px; font-size:0.9rem; opacity:0.7;">No Watermark version</p>
+                    <a href="${data.downloadUrl}" target="_blank" class="download-btn" download>
+                        Download Now
+                    </a>
+                </div>
+            `;
+        } else {
+            resultDiv.innerHTML = '<p class="error-msg">❌ Error. The video might be private, deleted, or the link is invalid!</p>';
+        }
+    } catch (error) {
+        loader.style.display = 'none';
+        searchBtn.disabled = false;
+        btnText.innerText = 'Get Video';
+        searchBtn.style.opacity = '1';
+        
+        console.error(error);
+        resultDiv.innerHTML = '<p class="error-msg">💥 Network error. Please try again later.</p>';
+    }
+}
+</script>
+
+</body>
+</html>
